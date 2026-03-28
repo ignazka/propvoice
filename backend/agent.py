@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from livekit import agents, rtc
 from livekit.agents import AutoSubscribe, JobContext, WorkerOptions, cli
-from livekit.plugins import openai as lk_openai
+from livekit.plugins import openai as lk_openai, groq as lk_groq
 from supabase import create_client
 
 load_dotenv()
@@ -17,7 +17,7 @@ supabase = create_client(
 async def transcribe_und_speichern(audio_track: rtc.Track):
     print("Transkription gestartet...")
     try:
-        stt = lk_openai.STT()
+        stt = lk_groq.STT()
         audio_stream = rtc.AudioStream(audio_track)
         stt_stream = stt.stream()
 
@@ -71,6 +71,7 @@ async def transcribe_und_speichern(audio_track: rtc.Track):
 
 
 async def entrypoint(ctx: JobContext):
+    load_dotenv()  # Im Subprocess neu laden
     await ctx.connect(auto_subscribe=AutoSubscribe.AUDIO_ONLY)
     participant = await ctx.wait_for_participant()
     print(f"Teilnehmer verbunden: {participant.identity}")
