@@ -21,3 +21,5 @@ terraform/*.tfvars
 
 # OS
 .DS_Store
+
+CLAUDE.local.md
