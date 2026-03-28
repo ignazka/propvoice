@@ -1,0 +1,1 @@
+- [User role](user_role.md) — Builds PropVoice to learn; wants explanations before/during implementation
