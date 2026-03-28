@@ -37,6 +37,7 @@ function MicButton() {
 
 export default function MeldenPage() {
   const [token, setToken] = useState<string | null>(null)
+  const [livekitUrl, setLivekitUrl] = useState<string | null>(null)
   const [gesendet, setGesendet] = useState(false)
   const [fehler, setFehler] = useState<string | null>(null)
 
@@ -49,6 +50,7 @@ export default function MeldenPage() {
     }
     const data = await res.json()
     setToken(data.token)
+    setLivekitUrl(data.url)
   }
 
   if (gesendet) {
@@ -69,7 +71,7 @@ export default function MeldenPage() {
 
         {fehler && <p className="text-sm text-red-600">{fehler}</p>}
 
-        {!token ? (
+        {!token || !livekitUrl ? (
           <button
             onClick={starten}
             className="bg-black text-white rounded-full px-8 py-3 text-sm hover:bg-zinc-800"
@@ -79,7 +81,7 @@ export default function MeldenPage() {
         ) : (
           <LiveKitRoom
             token={token}
-            serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
+            serverUrl={livekitUrl}
             audio={false}
             video={false}
           >
