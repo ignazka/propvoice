@@ -51,13 +51,16 @@ export default function MeldenPage() {
 
   async function sprechen() {
     setLaden(true)
-    const res = await fetch('http://localhost:8000/api/token')
-    if (res.ok) {
-      const data = await res.json()
-      setToken(data.token)
-      setLivekitUrl(data.url)
+    try {
+      const res = await fetch('http://localhost:8000/api/token')
+      if (res.ok) {
+        const data = await res.json()
+        setToken(data.token)
+        setLivekitUrl(data.url)
+      }
+    } finally {
+      setLaden(false)
     }
-    setLaden(false)
   }
 
   if (gesendet) {
