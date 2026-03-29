@@ -10,7 +10,7 @@ app = FastAPI(title="PropVoice API", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "http://192.168.178.79:3000", "https://192.168.178.79:3000"],
     allow_methods=["GET"],
     allow_headers=["*"],
 )

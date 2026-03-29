@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   LiveKitRoom,
   useLocalParticipant,
@@ -10,7 +10,15 @@ import {
 function MicButton() {
   const { localParticipant, isMicrophoneEnabled } = useLocalParticipant()
 
+  // Mikrofon automatisch aktivieren sobald die Verbindung steht
+  useEffect(() => {
+    if (localParticipant) {
+      localParticipant.setMicrophoneEnabled(true)
+    }
+  }, [localParticipant])
+
   async function toggleMic() {
+    if (!localParticipant) return
     await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)
   }
 
@@ -39,18 +47,20 @@ export default function MeldenPage() {
   const [token, setToken] = useState<string | null>(null)
   const [livekitUrl, setLivekitUrl] = useState<string | null>(null)
   const [gesendet, setGesendet] = useState(false)
-  const [fehler, setFehler] = useState<string | null>(null)
+  const [laden, setLaden] = useState(false)
 
-  async function starten() {
-    setFehler(null)
-    const res = await fetch('http://localhost:8000/api/token')
-    if (!res.ok) {
-      setFehler('Verbindung fehlgeschlagen. Ist der Backend-Server gestartet?')
-      return
+  async function sprechen() {
+    setLaden(true)
+    try {
+      const res = await fetch('http://localhost:8000/api/token')
+      if (res.ok) {
+        const data = await res.json()
+        setToken(data.token)
+        setLivekitUrl(data.url)
+      }
+    } finally {
+      setLaden(false)
     }
-    const data = await res.json()
-    setToken(data.token)
-    setLivekitUrl(data.url)
   }
 
   if (gesendet) {
@@ -69,14 +79,13 @@ export default function MeldenPage() {
       <div className="flex flex-col items-center gap-6 max-w-sm text-center">
         <h1 className="text-2xl font-semibold">Schaden melden</h1>
 
-        {fehler && <p className="text-sm text-red-600">{fehler}</p>}
-
         {!token || !livekitUrl ? (
           <button
-            onClick={starten}
-            className="bg-black text-white rounded-full px-8 py-3 text-sm hover:bg-zinc-800"
+            onClick={sprechen}
+            disabled={laden}
+            className="w-24 h-24 rounded-full bg-black text-white text-sm font-medium hover:bg-zinc-800 disabled:opacity-50"
           >
-            Verbinden
+            {laden ? '…' : 'Sprechen'}
           </button>
         ) : (
           <LiveKitRoom
